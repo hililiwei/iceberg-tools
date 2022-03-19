@@ -1,0 +1,95 @@
+{
+  "format-version" : 1,
+  "table-uuid" : "6aacd689-5457-44df-bffa-974b611b049c",
+  "location" : "file:/tmp/warehouse1148694098868367750.tmp/default/table_2",
+  "last-updated-ms" : 1647666383113,
+  "last-column-id" : 2,
+  "schema" : {
+    "type" : "struct",
+    "schema-id" : 0,
+    "fields" : [ {
+      "id" : 1,
+      "name" : "id",
+      "required" : false,
+      "type" : "long"
+    }, {
+      "id" : 2,
+      "name" : "data",
+      "required" : false,
+      "type" : "string"
+    } ]
+  },
+  "current-schema-id" : 0,
+  "schemas" : [ {
+    "type" : "struct",
+    "schema-id" : 0,
+    "fields" : [ {
+      "id" : 1,
+      "name" : "id",
+      "required" : false,
+      "type" : "long"
+    }, {
+      "id" : 2,
+      "name" : "data",
+      "required" : false,
+      "type" : "string"
+    } ]
+  } ],
+  "partition-spec" : [ {
+    "name" : "data",
+    "transform" : "identity",
+    "source-id" : 2,
+    "field-id" : 1000
+  } ],
+  "default-spec-id" : 0,
+  "partition-specs" : [ {
+    "spec-id" : 0,
+    "fields" : [ {
+      "name" : "data",
+      "transform" : "identity",
+      "source-id" : 2,
+      "field-id" : 1000
+    } ]
+  } ],
+  "last-partition-id" : 1000,
+  "default-sort-order-id" : 0,
+  "sort-orders" : [ {
+    "order-id" : 0,
+    "fields" : [ ]
+  } ],
+  "properties" : {
+    "owner" : "dev"
+  },
+  "current-snapshot-id" : 8115727803695877401,
+  "refs" : {
+    "main" : {
+      "type" : "branch",
+      "snapshot-id" : 8115727803695877401
+    }
+  },
+  "snapshots" : [ {
+    "snapshot-id" : 8115727803695877401,
+    "timestamp-ms" : 1647666383113,
+    "summary" : {
+      "operation" : "append",
+      "spark.app.id" : "local-1647666376313",
+      "added-data-files" : "2",
+      "added-records" : "2",
+      "added-files-size" : "1315",
+      "changed-partition-count" : "2",
+      "total-records" : "2",
+      "total-files-size" : "1315",
+      "total-data-files" : "2",
+      "total-delete-files" : "0",
+      "total-position-deletes" : "0",
+      "total-equality-deletes" : "0"
+    },
+    "manifest-list" : "file:/tmp/warehouse1148694098868367750.tmp/default/table_2/metadata/snap-8115727803695877401-1-1702989a-f66f-423a-aaf1-a01b9a699685.avro",
+    "schema-id" : 0
+  } ],
+  "snapshot-log" : [ {
+    "timestamp-ms" : 1647666383113,
+    "snapshot-id" : 8115727803695877401
+  } ],
+  "metadata-log" : [ ]
+}
