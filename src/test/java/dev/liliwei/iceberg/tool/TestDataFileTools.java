@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.avro.tool;
+package dev.liliwei.iceberg.tool;
 
 import static org.junit.Assert.assertEquals;
 
@@ -31,8 +31,6 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import dev.liliwei.iceberg.tool.ManifestFileReadTool;
-import dev.liliwei.iceberg.tool.Tool;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
