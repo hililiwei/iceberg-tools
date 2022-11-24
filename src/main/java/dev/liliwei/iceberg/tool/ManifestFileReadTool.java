@@ -51,7 +51,8 @@ import joptsimple.OptionSpec;
 public class ManifestFileReadTool implements Tool {
     private static final long DEFAULT_HEAD_COUNT = 10;
 
-    private static long getHeadCount(OptionSet optionSet, OptionSpec<String> headOption, List<String> nargs) {
+    private static long getHeadCount(
+            OptionSet optionSet, OptionSpec<String> headOption, List<String> nargs) {
         long headCount = Long.MAX_VALUE;
         if (optionSet.has(headOption)) {
             headCount = DEFAULT_HEAD_COUNT;
@@ -85,17 +86,23 @@ public class ManifestFileReadTool implements Tool {
     }
 
     @Override
-    public int run(InputStream stdin, PrintStream out, PrintStream err, List<String> args) throws Exception {
+    public int run(InputStream stdin, PrintStream out, PrintStream err, List<String> args)
+            throws Exception {
         OptionParser optionParser = new OptionParser();
         OptionSpec<Void> prettyOption = optionParser.accepts("pretty", "Turns on pretty printing.");
-        String headDesc = String.format("Converts the first X records (default is %d).", DEFAULT_HEAD_COUNT);
+        String headDesc =
+                String.format("Converts the first X records (default is %d).", DEFAULT_HEAD_COUNT);
         OptionSpec<String> headOption = optionParser.accepts("head", headDesc).withOptionalArg();
-        OptionSpec<String> readerSchemaFileOption = optionParser.accepts("reader-schema-file", "Reader schema file")
-            .withOptionalArg()
-            .ofType(String.class);
-        OptionSpec<String> readerSchemaOption = optionParser.accepts("reader-schema", "Reader schema")
-            .withOptionalArg()
-            .ofType(String.class);
+        OptionSpec<String> readerSchemaFileOption =
+                optionParser
+                        .accepts("reader-schema-file", "Reader schema file")
+                        .withOptionalArg()
+                        .ofType(String.class);
+        OptionSpec<String> readerSchemaOption =
+                optionParser
+                        .accepts("reader-schema", "Reader schema")
+                        .withOptionalArg()
+                        .ofType(String.class);
 
         OptionSet optionSet = optionParser.parse(args.toArray(new String[0]));
         Boolean pretty = optionSet.has(prettyOption);
@@ -122,7 +129,8 @@ public class ManifestFileReadTool implements Tool {
 
         BufferedInputStream inStream = Util.fileOrStdin(nargs.get(0), stdin);
 
-        JsonReader jsonReader = new Gson().newJsonReader(new BufferedReader(new FileReader(nargs.get(1))));
+        JsonReader jsonReader =
+                new Gson().newJsonReader(new BufferedReader(new FileReader(nargs.get(1))));
         Map<Integer, String> icebergFields = parseMetaData(jsonReader);
 
         GenericDatumReader<Object> reader = new GenericDatumReader<>();
@@ -134,7 +142,9 @@ public class ManifestFileReadTool implements Tool {
             DatumWriter writer = new IcebergDatumWriter<>(schema, icebergFields);
             IcebergEncoder encoder = new IcebergEncoder(schema, out, pretty);
             out.println("[");
-            for (long recordCount = 0; streamReader.hasNext() && recordCount < headCount; recordCount++) {
+            for (long recordCount = 0;
+                    streamReader.hasNext() && recordCount < headCount;
+                    recordCount++) {
                 Object datum = streamReader.next();
                 writer.write(datum, encoder);
                 encoder.flush();
@@ -163,23 +173,26 @@ public class ManifestFileReadTool implements Tool {
         JsonElement root = JsonParser.parseReader(jsonReader);
         JsonObject asJsonObject = root.getAsJsonObject();
 
-        AtomicReference<JsonObject> schemaRef = new AtomicReference<>(asJsonObject.getAsJsonObject("schema"));
+        AtomicReference<JsonObject> schemaRef =
+                new AtomicReference<>(asJsonObject.getAsJsonObject("schema"));
         if (schemaRef.get() == null) {
             int schemaId = asJsonObject.get("current-schema-id").getAsInt();
             JsonArray schemas = asJsonObject.getAsJsonArray("schemas");
-            schemas.forEach(schemaArr -> {
-                JsonObject schemaObj = schemaArr.getAsJsonObject();
-                if (schemaObj.get("schema-id").getAsInt() == schemaId) {
-                    schemaRef.set(schemaObj);
-                }
-            });
+            schemas.forEach(
+                    schemaArr -> {
+                        JsonObject schemaObj = schemaArr.getAsJsonObject();
+                        if (schemaObj.get("schema-id").getAsInt() == schemaId) {
+                            schemaRef.set(schemaObj);
+                        }
+                    });
         }
         JsonArray fields = schemaRef.get().getAsJsonArray("fields");
         Iterator<JsonElement> iterator = fields.iterator();
-        iterator.forEachRemaining(fieldJson -> {
-            JsonObject field = fieldJson.getAsJsonObject();
-            fieldMap.put(field.get("id").getAsInt(), field.get("type").getAsString());
-        });
+        iterator.forEachRemaining(
+                fieldJson -> {
+                    JsonObject field = fieldJson.getAsJsonObject();
+                    fieldMap.put(field.get("id").getAsInt(), field.get("type").getAsString());
+                });
         return fieldMap;
     }
 }

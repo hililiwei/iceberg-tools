@@ -32,20 +32,20 @@ import java.io.InputStream;
 /** Static utility methods for tools. */
 public class Util {
     /**
-     * Returns stdin if filename is "-", else opens the File in the owning
-     * filesystem and returns an InputStream for it. Relative paths will be opened
-     * in the default filesystem.
+     * Returns stdin if filename is "-", else opens the File in the owning filesystem and returns an
+     * InputStream for it. Relative paths will be opened in the default filesystem.
      *
      * @param filename The filename to be opened
      * @throws IOException
      */
-    public static BufferedInputStream fileOrStdin(String filename, InputStream stdin) throws IOException {
+    public static BufferedInputStream fileOrStdin(String filename, InputStream stdin)
+            throws IOException {
         return new BufferedInputStream(filename.equals("-") ? stdin : openFromFS(filename));
     }
 
     /**
-     * Returns an InputStream for the file using the owning filesystem, or the
-     * default if none is given.
+     * Returns an InputStream for the file using the owning filesystem, or the default if none is
+     * given.
      *
      * @param filename The filename to be opened
      * @throws IOException
@@ -56,8 +56,7 @@ public class Util {
     }
 
     /**
-     * Closes the inputstream created from {@link Util.fileOrStdin} unless it is
-     * System.in.
+     * Closes the inputstream created from {@link Util.fileOrStdin} unless it is System.in.
      *
      * @param in The inputstream to be closed.
      */

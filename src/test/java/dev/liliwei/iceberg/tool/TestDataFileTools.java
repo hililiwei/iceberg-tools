@@ -18,24 +18,11 @@
 
 package dev.liliwei.iceberg.tool;
 
-import static org.junit.Assert.assertEquals;
-
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-
-import org.apache.avro.Schema;
-import org.apache.avro.Schema.Type;
-import org.apache.avro.file.DataFileWriter;
-import org.apache.avro.generic.GenericDatumWriter;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -45,6 +32,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
+import org.apache.avro.Schema;
+import org.apache.avro.Schema.Type;
+import org.apache.avro.file.DataFileWriter;
+import org.apache.avro.generic.GenericDatumWriter;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 @SuppressWarnings("deprecation")
 public class TestDataFileTools {
@@ -54,8 +50,7 @@ public class TestDataFileTools {
 
     private static final String ESCAPED_KEY = "trn\\\\\\r\\t\\n";
 
-    @ClassRule
-    public static TemporaryFolder DIR = new TemporaryFolder();
+    @ClassRule public static TemporaryFolder DIR = new TemporaryFolder();
 
     static File sampleFile;
 
@@ -75,7 +70,8 @@ public class TestDataFileTools {
         }
 
         StringBuilder builder = new StringBuilder();
-        try (DataFileWriter<Object> writer = new DataFileWriter<>(new GenericDatumWriter<>(schema))) {
+        try (DataFileWriter<Object> writer =
+                new DataFileWriter<>(new GenericDatumWriter<>(schema))) {
             writer.setMeta(KEY_NEEDING_ESCAPES, "");
             writer.create(schema, sampleFile);
 
@@ -96,26 +92,12 @@ public class TestDataFileTools {
     private String run(Tool tool, InputStream stdin, String... args) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream p = new PrintStream(baos);
-        tool.run(stdin, p, // stdout
-            null, // stderr
-            Arrays.asList(args));
+        tool.run(
+                stdin,
+                p, // stdout
+                null, // stderr
+                Arrays.asList(args));
         return baos.toString("UTF-8").replace("\r", "");
-    }
-
-    @Test
-    public void testRead() throws Exception {
-        assertEquals(jsonData, run(new ManifestFileReadTool(), sampleFile.getPath()));
-    }
-
-    @Test
-    public void testReadStdin() throws Exception {
-        FileInputStream stdin = new FileInputStream(sampleFile);
-        assertEquals(jsonData, run(new ManifestFileReadTool(), stdin, "-"));
-    }
-
-    @Test
-    public void testReadToJsonPretty() throws Exception {
-        assertEquals(jsonData, run(new ManifestFileReadTool(), "--pretty", sampleFile.getPath()));
     }
 
     @Test
@@ -124,21 +106,35 @@ public class TestDataFileTools {
 
         Path resourceDirectory = Paths.get("src", "test", "resources");
 
-        String[] args = new String[] {
-            "tojson",
-            resourceDirectory.toString() + File.separatorChar + "1702989a-f66f-423a-aaf1-a01b9a699685-m0.avro",
-            resourceDirectory.toString() + File.separatorChar + "v1.metadata.json"
-        };
+        String[] args =
+                new String[] {
+                    "tojson",
+                    resourceDirectory.toString()
+                            + File.separatorChar
+                            + "1702989a-f66f-423a-aaf1-a01b9a699685-m0.avro",
+                    resourceDirectory.toString() + File.separatorChar + "v1.metadata.json"
+                };
 
-        dataFileReadTool.run(System.in, System.out, System.err, Arrays.asList(args).subList(1, args.length));
+        dataFileReadTool.run(
+                System.in, System.out, System.err, Arrays.asList(args).subList(1, args.length));
     }
 
     @Test
     public void testReadMetaData() throws Exception {
-
         ManifestFileReadTool dataFileReadTool = new ManifestFileReadTool();
-        JsonReader jsonReader = new Gson().newJsonReader(new BufferedReader(new FileReader("D:\\v1.metadata.json")));
+        JsonReader jsonReader =
+                new Gson()
+                        .newJsonReader(
+                                new BufferedReader(
+                                        new FileReader(
+                                                this.getClass()
+                                                        .getResource("/v1.metadata.json")
+                                                        .getFile())));
         Map<Integer, String> integerStringMap = dataFileReadTool.parseMetaData(jsonReader);
-    }
+        Assert.assertTrue(integerStringMap.containsKey(1));
+        Assert.assertEquals(integerStringMap.get(1), "long");
 
+        Assert.assertTrue(integerStringMap.containsKey(2));
+        Assert.assertEquals(integerStringMap.get(2), "string");
+    }
 }

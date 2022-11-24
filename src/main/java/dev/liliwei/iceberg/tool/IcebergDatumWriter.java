@@ -72,21 +72,19 @@ public class IcebergDatumWriter<D> extends GenericDatumWriter<D> {
     protected void write(Schema schema, Object datum, Encoder out) throws IOException {
         LogicalType logicalType = schema.getLogicalType();
         if (datum != null && logicalType != null) {
-            Conversion<?> conversion = getData().getConversionByClass(datum.getClass(), logicalType);
+            Conversion<?> conversion =
+                    getData().getConversionByClass(datum.getClass(), logicalType);
             writeWithoutConversion(schema, convert(schema, logicalType, conversion, datum), out);
         } else {
             writeWithoutConversion(schema, datum, out);
         }
     }
 
-    /**
-     * Called to write a record. May be overridden for alternate record
-     * representations.
-     */
+    /** Called to write a record. May be overridden for alternate record representations. */
     protected void writeRecord(Schema schema, Object datum, Encoder out) throws IOException {
         for (Schema.Field f : schema.getFields()) {
-            if (schema.getName().equalsIgnoreCase("r2")){
-                if ( boundKeys.contains(f.name().toLowerCase(Locale.ROOT))) {
+            if (schema.getName().equalsIgnoreCase("r2")) {
+                if (boundKeys.contains(f.name().toLowerCase(Locale.ROOT))) {
                     isBoundKey = true;
                 } else {
                     isBoundKey = false;
@@ -97,16 +95,17 @@ public class IcebergDatumWriter<D> extends GenericDatumWriter<D> {
     }
 
     /**
-     * Called to write a single field of a record. May be overridden for more
-     * efficient or alternate implementations.
+     * Called to write a single field of a record. May be overridden for more efficient or alternate
+     * implementations.
      */
-    protected void writeField(Object datum, Schema.Field f, Encoder out, Object state) throws IOException {
+    protected void writeField(Object datum, Schema.Field f, Encoder out, Object state)
+            throws IOException {
         Object value = getData().getField(datum, f.name(), f.pos());
         try {
             write(f.schema(), value, out);
         } catch (final UnresolvedUnionException uue) { // recreate it with the right field info
-            final UnresolvedUnionException unresolvedUnionException = new UnresolvedUnionException(f.schema(), f,
-                value);
+            final UnresolvedUnionException unresolvedUnionException =
+                    new UnresolvedUnionException(f.schema(), f, value);
             unresolvedUnionException.addSuppressed(uue);
             throw unresolvedUnionException;
         } catch (NullPointerException e) {
@@ -119,7 +118,8 @@ public class IcebergDatumWriter<D> extends GenericDatumWriter<D> {
     }
 
     /** Called to write data. */
-    protected void writeWithoutConversion(Schema schema, Object datum, Encoder out) throws IOException {
+    protected void writeWithoutConversion(Schema schema, Object datum, Encoder out)
+            throws IOException {
         try {
             switch (schema.getType()) {
                 case RECORD:
@@ -183,27 +183,6 @@ public class IcebergDatumWriter<D> extends GenericDatumWriter<D> {
         }
     }
 
-    // /** Called to write data. */
-    // protected void writeWithoutConversion(Object datum, Encoder out) throws IOException {
-    //     try {
-    //         if (Integer.class.equals(datum.getClass())) {
-    //             out.writeInt((Integer) datum);
-    //         } else if (String.class.equals(datum.getClass()) || UUID.class.equals(datum.getClass())) {
-    //             out.writeString((CharSequence) datum);
-    //         } else if (Long.class.equals(datum.getClass())) {
-    //             out.writeLong((Long) datum);
-    //         } else if (Float.class.equals(datum.getClass())) {
-    //             out.writeFloat((Float) datum);
-    //         } else if (Double.class.equals(datum.getClass())) {
-    //             out.writeDouble((Double) datum);
-    //         } else {
-    //             error(datum);
-    //         }
-    //     } catch (NullPointerException e) {
-    //         throw npe(e, "");
-    //     }
-    // }
-
     private void error(Object datum) {
         throw new NotSupportedException("Not Supported" + ": " + datum);
     }
@@ -219,6 +198,6 @@ public class IcebergDatumWriter<D> extends GenericDatumWriter<D> {
         String valueStr = metricValue.toString();
         String type = primitiveType.toString();
         String result = "value:" + valueStr + ";type:" + type;
-       return ByteBuffer.wrap(result.getBytes(StandardCharsets.UTF_8));
+        return ByteBuffer.wrap(result.getBytes(StandardCharsets.UTF_8));
     }
 }

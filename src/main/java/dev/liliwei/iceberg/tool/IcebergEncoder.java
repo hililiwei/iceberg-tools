@@ -44,9 +44,7 @@ public class IcebergEncoder extends ParsingEncoder implements Parser.ActionHandl
 
     final Parser parser;
 
-    /**
-     * Has anything been written into the collections?
-     */
+    /** Has anything been written into the collections? */
     protected BitSet isEmpty = new BitSet();
 
     private JsonGenerator out;
@@ -68,16 +66,18 @@ public class IcebergEncoder extends ParsingEncoder implements Parser.ActionHandl
 
     // by default, one object per line.
     // with pretty option use default pretty printer with root line separator.
-    private static JsonGenerator getJsonGenerator(OutputStream out, boolean pretty) throws IOException {
+    private static JsonGenerator getJsonGenerator(OutputStream out, boolean pretty)
+            throws IOException {
         Objects.requireNonNull(out, "OutputStream cannot be null");
         JsonGenerator g = new JsonFactory().createGenerator(out, JsonEncoding.UTF8);
         if (pretty) {
-            DefaultPrettyPrinter pp = new DefaultPrettyPrinter() {
-                @Override
-                public void writeRootValueSeparator(JsonGenerator jg) throws IOException {
-                    jg.writeRaw(LINE_SEPARATOR);
-                }
-            };
+            DefaultPrettyPrinter pp =
+                    new DefaultPrettyPrinter() {
+                        @Override
+                        public void writeRootValueSeparator(JsonGenerator jg) throws IOException {
+                            jg.writeRaw(LINE_SEPARATOR);
+                        }
+                    };
             g.setPrettyPrinter(pp);
         } else {
             MinimalPrettyPrinter pp = new MinimalPrettyPrinter();
@@ -105,12 +105,11 @@ public class IcebergEncoder extends ParsingEncoder implements Parser.ActionHandl
 
     /**
      * Reconfigures this IcebergEncoder to use the output stream provided.
-     * <p/>
-     * If the OutputStream provided is null, a NullPointerException is thrown.
-     * <p/>
-     * Otherwise, this IcebergEncoder will flush its current output and then
-     * reconfigure its output to use a default UTF8 JsonGenerator that writes to the
-     * provided OutputStream.
+     *
+     * <p>If the OutputStream provided is null, a NullPointerException is thrown.
+     *
+     * <p>Otherwise, this IcebergEncoder will flush its current output and then reconfigure its
+     * output to use a default UTF8 JsonGenerator that writes to the provided OutputStream.
      *
      * @param out The OutputStream to direct output to. Cannot be null.
      * @throws IOException
@@ -124,11 +123,11 @@ public class IcebergEncoder extends ParsingEncoder implements Parser.ActionHandl
 
     /**
      * Reconfigures this IcebergEncoder to output to the JsonGenerator provided.
-     * <p/>
-     * If the JsonGenerator provided is null, a NullPointerException is thrown.
-     * <p/>
-     * Otherwise, this IcebergEncoder will flush its current output and then
-     * reconfigure its output to use the provided JsonGenerator.
+     *
+     * <p>If the JsonGenerator provided is null, a NullPointerException is thrown.
+     *
+     * <p>Otherwise, this IcebergEncoder will flush its current output and then reconfigure its
+     * output to use the provided JsonGenerator.
      *
      * @param generator The JsonGenerator to direct output to. Cannot be null.
      * @throws IOException
@@ -223,7 +222,11 @@ public class IcebergEncoder extends ParsingEncoder implements Parser.ActionHandl
         Symbol.IntCheckAction top = (Symbol.IntCheckAction) parser.popSymbol();
         if (len != top.size) {
             throw new AvroTypeException(
-                "Incorrect length for fixed binary: expected " + top.size + " but received " + len + " bytes.");
+                    "Incorrect length for fixed binary: expected "
+                            + top.size
+                            + " but received "
+                            + len
+                            + " bytes.");
         }
         writeByteArray(bytes, start, len);
     }
@@ -233,7 +236,8 @@ public class IcebergEncoder extends ParsingEncoder implements Parser.ActionHandl
         parser.advance(Symbol.ENUM);
         Symbol.EnumLabelsAction top = (Symbol.EnumLabelsAction) parser.popSymbol();
         if (e < 0 || e >= top.size) {
-            throw new AvroTypeException("Enumeration out of range: max is " + top.size + " but received " + e);
+            throw new AvroTypeException(
+                    "Enumeration out of range: max is " + top.size + " but received " + e);
         }
         out.writeString(top.getLabel(e));
     }
